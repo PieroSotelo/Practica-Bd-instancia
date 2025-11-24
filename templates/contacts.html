@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados</title>
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700 min-h-screen py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900">Usuarios Registrados
+                    {% if usuarios %}
+                    <span class="ml-4 inline-block bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold">{{ usuarios|length }} usuarios</span>
+                    {% endif %}
+                </h1>
+            </div>
+            <a href="{{ url_for('index') }}" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition transform hover:scale-105 shadow-md">← Volver al Registro</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-6 space-y-3">
+            {% for category, message in messages %}
+            <div class="px-4 py-3 rounded-lg border-l-4 font-medium shadow-md {{ 'bg-green-100 border-green-500 text-green-700' if category == 'success' else 'bg-red-100 border-red-500 text-red-700' }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if usuarios %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                    <tr>
+                        <th class="px-6 py-4 text-left font-bold text-sm uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-left font-bold text-sm uppercase tracking-wider">Nombre</th>
+                        <th class="px-6 py-4 text-left font-bold text-sm uppercase tracking-wider">Correo</th>
+                        <th class="px-6 py-4 text-left font-bold text-sm uppercase tracking-wider">Teléfono</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for usuario in usuarios %}
+                    <tr class="hover:bg-gray-50 transition duration-200">
+                        <td class="px-6 py-4 text-gray-900 font-semibold">#{{ usuario[0] }}</td>
+                        <td class="px-6 py-4 text-gray-700">{{ usuario[1] }}</td>
+                        <td class="px-6 py-4 text-gray-700">{{ usuario[2] }}</td>
+                        <td class="px-6 py-4 text-gray-700">{{ usuario[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-lg p-12 text-center">
+            <div class="text-6xl mb-4">📭</div>
+            <p class="text-2xl text-gray-600 mb-6">No hay usuarios registrados aún.</p>
+            <a href="{{ url_for('index') }}" class="inline-block bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105 shadow-md">Registrar primer usuario</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

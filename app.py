@@ -10,7 +10,7 @@ import os
 app = Flask(__name__)
 
 app.secret_key = "clave_secreta"
-app.config['MYSQL_HOST'] = '3.90.215.92'
+app.config['MYSQL_HOST'] = '54.83.118.199'
 app.config['MYSQL_USER'] = 'pieroj'
 app.config['MYSQL_PASSWORD'] = 'pjsm1512'
 app.config['MYSQL_DB'] = 'floreria_db'
@@ -20,10 +20,13 @@ mysql = MySQL(app)
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
-        # Aquí puedes manejar los datos enviados por el formulario
-        nombre = request.form['nombre']
-        correo = request.form['correo']
-        phone = request.form['phone']
+        nombre = request.form.get('nombre', '').strip()
+        correo = request.form.get('correo', '').strip()
+        phone = request.form.get('phone', '').strip()
+
+        if not nombre or not correo or not phone:
+            flash('Todos los campos son requeridos', 'danger')
+            return redirect(url_for('index'))
 
         cur = mysql.connection.cursor()
         try:
@@ -33,10 +36,24 @@ def index():
         except Exception as e:
             mysql.connection.rollback()
             flash('Error al agregar usuario: ' + str(e), 'danger')
+            return redirect(url_for('index'))
         finally:
             cur.close()
-        return redirect(url_for('index'))
+        return redirect(url_for('contacts'))
     return render_template('index.html')
 
+@app.route('/contacts', methods=['GET'])
+def contacts():
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id, nombre, correo, phone FROM usuarios")
+        usuarios = cur.fetchall()
+    except Exception as e:
+        usuarios = []
+        flash('Error al obtener usuarios: ' + str(e), 'danger')
+    finally:
+        cur.close()
+    return render_template('contacts.html', usuarios=usuarios)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
